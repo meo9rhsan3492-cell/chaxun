@@ -87,24 +87,7 @@
                 </div>
             </div>
         </div>
-
-        <!-- Vercel Info Box -->
-        <div class="card p-6 md:p-8 mb-8 bg-blue-50 border border-blue-200">
-            <h3 class="text-lg font-bold text-blue-800 mb-2">重要部署提示 (Vercel)</h3>
-            <p class="text-blue-700">
-                为了解决网络请求问题，此应用的前端代码已移除直接的API调用。您需要在您的Vercel项目中创建一个Serverless Function (例如在 `/api/get-customers.js` 路径下) 来处理对AI的请求。
-            </p>
-            <ol class="list-decimal list-inside mt-4 text-blue-700 space-y-2">
-                <li>前端将通过 <code>fetch('/api/get-customers', ...)</code> 将产品和市场信息发送到您的后端函数。</li>
-                <li>您的后端函数接收到请求后，负责调用Google Gemini API。</li>
-                <li>后端函数获取到AI返回的客户数据后，将其作为JSON响应返回给前端。</li>
-            </ol>
-            <p class="mt-4 text-sm text-blue-600">
-                这种“后端代理”模式是解决此类跨域问题的标准方案，可以确保应用的稳定运行。
-            </p>
-        </div>
-
-
+        
         <!-- Results Section -->
         <div id="results-container" class="hidden">
             <div class="flex justify-between items-center mb-6">
@@ -159,10 +142,7 @@
 
         let foundCompanies = new Set();
         
-        // This function simulates calling your Vercel Serverless Function.
-        // You need to create a file like `/api/get-customers.js` in your Vercel project.
         async function getCustomersFromBackend(product, market) {
-            // This is the endpoint for your backend function on Vercel
             const BACKEND_API_URL = '/api/get-customers';
 
             try {
@@ -173,16 +153,14 @@
                 });
 
                 if (!response.ok) {
-                    const errorBody = await response.text();
+                    const errorBody = await response.json(); 
                     console.error("Backend Error Response:", errorBody);
-                    throw new Error(`Backend error! status: ${response.status}`);
+                    throw new Error(errorBody.error || `Backend error! status: ${response.status}`);
                 }
                 return await response.json();
 
             } catch (error) {
                 console.error("Failed to fetch from backend:", error);
-                // In a real scenario, you'd handle this more gracefully.
-                // For now, we throw the error to be caught by the main handler.
                 throw error;
             }
         }
@@ -201,12 +179,16 @@
             hideError();
 
             try {
-                // Now we call our backend function instead of Google's API directly.
                 const customers = await getCustomersFromBackend(product, market);
                 displayResultsInTable(customers);
             } catch (error) {
                 console.error('Error fetching data:', error);
-                showError('调用后端服务时发生错误，请检查您的Serverless Function。');
+                // Provide a more specific error message for preview environments
+                if (window.location.origin === 'null' || window.location.protocol === 'blob:') {
+                     showError('此功能在预览模式下无法使用。请将应用部署到Vercel，然后在Vercel提供的网址上进行测试。');
+                } else {
+                     showError('调用后端服务时发生错误，请检查您在Vercel上的Serverless Function日志获取详细信息。');
+                }
             } finally {
                 loader.style.display = 'none';
             }
