@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>������ó�ͻ���Ϣ�ռ���</title>
+    <title>智能外贸客户信息收集器</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -65,25 +64,25 @@
     <div id="app" class="container mx-auto p-4 md:p-8 max-w-screen-2xl">
         <!-- Header -->
         <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-slate-800">������ó�ͻ���Ϣ�ռ���</h1>
-            <p class="mt-2 text-lg text-slate-500">�������Ĳ�Ʒ��Ŀ���г���AI Ϊ���Ѽ�Ǳ�ڿͻ���Ϣ</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-800">智能外贸客户信息收集器</h1>
+            <p class="mt-2 text-lg text-slate-500">输入您的产品和目标市场，AI 为您搜集潜在客户信息</p>
         </header>
 
         <!-- Input Form -->
         <div class="card p-6 md:p-8 mb-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
                 <div>
-                    <label for="product" class="block text-sm font-medium text-slate-600 mb-2">���Ĳ�Ʒ / ��ҵ</label>
-                    <input type="text" id="product" class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="���磺̫���ܵ�ذ�, LED����, ľ�ƼҾ�">
+                    <label for="product" class="block text-sm font-medium text-slate-600 mb-2">您的产品 / 行业</label>
+                    <input type="text" id="product" class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="例如：太阳能电池板, LED照明, 木制家具">
                 </div>
                 <div>
-                    <label for="market" class="block text-sm font-medium text-slate-600 mb-2">Ŀ����� / �г�</label>
-                    <input type="text" id="market" class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="���磺����, �¹�, ������">
+                    <label for="market" class="block text-sm font-medium text-slate-600 mb-2">目标国家 / 市场</label>
+                    <input type="text" id="market" class="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="例如：美国, 德国, 东南亚">
                 </div>
                 <div class="md:col-span-2">
                     <button id="search-btn" class="w-full btn btn-primary font-bold py-3 px-4 rounded-md flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
-                        �Ѽ��ͻ���Ϣ
+                        搜集客户信息
                     </button>
                 </div>
             </div>
@@ -92,15 +91,15 @@
         <!-- Results Section -->
         <div id="results-container" class="hidden">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold text-slate-800">Ǳ�ڿͻ���Ϣ�б�</h2>
+                <h2 class="text-2xl font-bold text-slate-800">潜在客户信息列表</h2>
                 <div class="flex space-x-2">
                     <button id="export-csv-btn" class="btn btn-secondary font-semibold py-2 px-4 rounded-md flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                        ����ΪCSV
+                        导出为CSV
                     </button>
                     <button id="clear-results-btn" class="btn btn-secondary font-semibold py-2 px-4 rounded-md flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        ������
+                        清除结果
                     </button>
                 </div>
             </div>
@@ -112,13 +111,13 @@
                 <table id="results-table" class="w-full text-sm text-left text-slate-500">
                     <thead class="text-xs text-slate-700 uppercase">
                         <tr>
-                            <th scope="col" class="px-6 py-3">��˾</th>
-                            <th scope="col" class="px-6 py-3">��˾���</th>
-                            <th scope="col" class="px-6 py-3">��˾��վ</th>
-                            <th scope="col" class="px-6 py-3">��ϵ��</th>
-                            <th scope="col" class="px-6 py-3">����</th>
-                            <th scope="col" class="px-6 py-3">��ϵ��ʽ</th>
-                            <th scope="col" class="px-6 py-3 text-center">��ݲ���</th>
+                            <th scope="col" class="px-6 py-3">公司</th>
+                            <th scope="col" class="px-6 py-3">公司简介</th>
+                            <th scope="col" class="px-6 py-3">公司网站</th>
+                            <th scope="col" class="px-6 py-3">联系人</th>
+                            <th scope="col" class="px-6 py-3">国家</th>
+                            <th scope="col" class="px-6 py-3">联系方式</th>
+                            <th scope="col" class="px-6 py-3 text-center">快捷操作</th>
                         </tr>
                     </thead>
                     <tbody id="results-tbody">
@@ -180,14 +179,14 @@
                     displayResultsInTable(customers);
                 } catch (jsonError) {
                     console.error('Error parsing JSON from API:', jsonError, "Received text:", customersText);
-                    showError('AI���ص����ݸ�ʽ�����볢�Ե����ؼ��ʻ��Ժ����ԡ�');
+                    showError('AI返回的数据格式有误，请尝试调整关键词或稍后重试。');
                 }
             } else {
                 if (result.promptFeedback) {
                     console.error('Prompt feedback:', result.promptFeedback);
-                    showError('�������������ȫԭ����ֹ��������������롣');
+                    showError('您的请求可能因安全原因被阻止，请调整您的输入。');
                 } else {
-                    showError('δ���ҵ���ؿͻ���Ϣ���볢�Ը����ؼ��ʡ�');
+                    showError('未能找到相关客户信息，请尝试更换关键词。');
                 }
             }
         }
@@ -197,7 +196,7 @@
             const market = marketInput.value.trim();
 
             if (!product || !market) {
-                showError('�������Ʒ��Ŀ���г���');
+                showError('请输入产品和目标市场。');
                 return;
             }
 
@@ -236,7 +235,7 @@
                 processApiResult(result);
             } catch (apiError) {
                 console.error('Error calling Gemini API:', apiError);
-                showError('����AI����ʱ��������������Ժ����ԡ�');
+                showError('调用AI服务时发生网络错误，请稍后重试。');
             } finally {
                 loader.style.display = 'none';
             }
@@ -244,7 +243,7 @@
 
         function displayResultsInTable(customers) {
             if (!customers || customers.length === 0) {
-                 showError('����δ���ҵ�����ͻ���Ϣ���볢�Ը����ؼ��ʡ�');
+                 showError('本次未能找到更多客户信息，请尝试更换关键词。');
                 return;
             }
             
@@ -272,10 +271,10 @@
                         <td class="px-6 py-4">${customer.country || ''}</td>
                         <td class="px-6 py-4">${customer.contactInfo || ''}</td>
                         <td class="px-6 py-4 text-center">
-                            <a href="https://www.google.com/search?q=${encodeURIComponent(companyName)}" target="_blank" class="action-link bg-slate-200 hover:bg-slate-300" title="Google ����">
+                            <a href="https://www.google.com/search?q=${encodeURIComponent(companyName)}" target="_blank" class="action-link bg-slate-200 hover:bg-slate-300" title="Google 搜索">
                                 <svg class="w-4 h-4 text-slate-600" fill="currentColor" viewBox="0 0 24 24"><path d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12C5,7.75 8.36,4.73 12.19,4.73C15.29,4.73 17.1,6.7 17.1,6.7L19,4.72C19,4.72 16.56,2 12.19,2C6.42,2 2.03,6.8 2.03,12C2.03,17.2 6.42,22 12.19,22C17.6,22 21.54,18.33 21.54,12.81C21.54,11.9,21.35,11.1,21.35,11.1V11.1Z"/></svg>
                             </a>
-                            <a href="https://www.linkedin.com/search/results/companies/?keywords=${encodeURIComponent(companyName)}" target="_blank" class="action-link bg-blue-100 hover:bg-blue-200" title="LinkedIn ����">
+                            <a href="https://www.linkedin.com/search/results/companies/?keywords=${encodeURIComponent(companyName)}" target="_blank" class="action-link bg-blue-100 hover:bg-blue-200" title="LinkedIn 搜索">
                                 <svg class="w-4 h-4 text-blue-700" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
                             </a>
                         </td>
@@ -285,7 +284,7 @@
             });
 
             if (newCustomersFound === 0 && customers.length > 0) {
-                showError('��������δ�����µĿͻ���Ϣ��');
+                showError('本次搜索未发现新的客户信息。');
             }
 
             resultsTableContainer.style.display = 'block';
@@ -324,10 +323,10 @@
         }
 
         exportCsvBtn.addEventListener('click', () => {
-             const product = productInput.value.trim().replace(/\s+/g, '_') || "��Ʒ";
-             const market = marketInput.value.trim().replace(/\s+/g, '_') || "�г�";
+             const product = productInput.value.trim().replace(/\s+/g, '_') || "产品";
+             const market = marketInput.value.trim().replace(/\s+/g, '_') || "市场";
              const date = new Date().toISOString().slice(0, 10);
-             exportTableToCSV(`�ͻ�����_${product}_${market}_${date}.csv`);
+             exportTableToCSV(`客户线索_${product}_${market}_${date}.csv`);
         });
 
         clearResultsBtn.addEventListener('click', () => {
