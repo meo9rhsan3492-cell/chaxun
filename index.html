@@ -175,7 +175,9 @@
             const customersText = result.candidates?.[0]?.content?.parts?.[0]?.text;
             if (customersText) {
                 try {
-                    const customers = JSON.parse(customersText);
+                    // Clean the text to ensure it's valid JSON
+                    const cleanedText = customersText.replace(/```json/g, '').replace(/```/g, '').trim();
+                    const customers = JSON.parse(cleanedText);
                     displayResultsInTable(customers);
                 } catch (jsonError) {
                     console.error('Error parsing JSON from API:', jsonError, "Received text:", customersText);
@@ -205,29 +207,11 @@
             hideError();
 
             const userQuery = `Find 40 potential B2B customers, importers, or distributors for "${product}" in "${market}". For each, find the company name, a concise one-sentence company profile, their official website URL, a relevant contact person (like a purchasing manager), the country, and a contact email or phone number.`;
-            const systemPrompt = `You are a B2B market research assistant for foreign trade. Your task is to find potential importing companies. Provide a list of companies. For each company, you must find: 1. The company name. 2. A concise one-sentence company profile. 3. The official company website. 4. A key contact person's name (e.g., Purchasing Manager, Sourcing Manager, Owner). 5. The country. 6. A contact email or phone number. Return the response as a valid JSON array of objects. If a specific piece of information cannot be found, return an empty string for that field. Prioritize finding the official website and company profile. Avoid duplicate companies.`;
+            const systemPrompt = `You are a B2B market research assistant for foreign trade. Your task is to find potential importing companies. Provide a list of companies. For each company, you must find: 1. The company name. 2. A concise one-sentence company profile. 3. The official company website. 4. A key contact person's name (e.g., Purchasing Manager, Sourcing Manager, Owner). 5. The country. 6. A contact email or phone number. Your response must be ONLY a raw JSON array string. Do not use markdown fences (like \`\`\`json) or any other explanatory text. The response must be a string that can be directly parsed into a JSON array of objects. Each object should have these keys: "company", "profile", "website", "contactPerson", "country", "contactInfo". If a specific piece of information cannot be found, return an empty string for that field. Prioritize finding the official website and company profile. Avoid duplicate companies.`;
             
             const payload = {
                 contents: [{ parts: [{ text: userQuery }] }],
                 systemInstruction: { parts: [{ text: systemPrompt }] },
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "ARRAY",
-                        items: {
-                            type: "OBJECT",
-                            properties: {
-                                "company": { "type": "STRING" },
-                                "profile": { "type": "STRING" },
-                                "website": { "type": "STRING" },
-                                "contactPerson": { "type": "STRING" },
-                                "country": { "type": "STRING" },
-                                "contactInfo": { "type": "STRING" },
-                            },
-                            required: ["company", "profile", "website", "contactPerson", "country", "contactInfo"]
-                        }
-                    }
-                }
             };
 
             try {
