@@ -88,6 +88,23 @@
             </div>
         </div>
 
+        <!-- Vercel Info Box -->
+        <div class="card p-6 md:p-8 mb-8 bg-blue-50 border border-blue-200">
+            <h3 class="text-lg font-bold text-blue-800 mb-2">重要部署提示 (Vercel)</h3>
+            <p class="text-blue-700">
+                为了解决网络请求问题，此应用的前端代码已移除直接的API调用。您需要在您的Vercel项目中创建一个Serverless Function (例如在 `/api/get-customers.js` 路径下) 来处理对AI的请求。
+            </p>
+            <ol class="list-decimal list-inside mt-4 text-blue-700 space-y-2">
+                <li>前端将通过 <code>fetch('/api/get-customers', ...)</code> 将产品和市场信息发送到您的后端函数。</li>
+                <li>您的后端函数接收到请求后，负责调用Google Gemini API。</li>
+                <li>后端函数获取到AI返回的客户数据后，将其作为JSON响应返回给前端。</li>
+            </ol>
+            <p class="mt-4 text-sm text-blue-600">
+                这种“后端代理”模式是解决此类跨域问题的标准方案，可以确保应用的稳定运行。
+            </p>
+        </div>
+
+
         <!-- Results Section -->
         <div id="results-container" class="hidden">
             <div class="flex justify-between items-center mb-6">
@@ -141,58 +158,35 @@
         const resultsTableContainer = document.getElementById('results-table-container');
 
         let foundCompanies = new Set();
-
-        const API_KEY = ""; // This is intentionally left blank; the execution environment handles authentication.
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
-
-        async function callGeminiAPI(payload, retries = 3, delay = 1000) {
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    if (!response.ok) {
-                        const errorBody = await response.text();
-                        console.error("API Error Response:", errorBody);
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return await response.json();
-                } catch (error) {
-                    console.error(`Attempt ${i + 1} failed:`, error);
-                    if (i < retries - 1) {
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        delay *= 2;
-                    } else {
-                        throw error;
-                    }
-                }
-            }
-        }
-
-        function processApiResult(result) {
-            const customersText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (customersText) {
-                try {
-                    // Clean the text to ensure it's valid JSON
-                    const cleanedText = customersText.replace(/```json/g, '').replace(/```/g, '').trim();
-                    const customers = JSON.parse(cleanedText);
-                    displayResultsInTable(customers);
-                } catch (jsonError) {
-                    console.error('Error parsing JSON from API:', jsonError, "Received text:", customersText);
-                    showError('AI返回的数据格式有误，请尝试调整关键词或稍后重试。');
-                }
-            } else {
-                if (result.promptFeedback) {
-                    console.error('Prompt feedback:', result.promptFeedback);
-                    showError('您的请求可能因安全原因被阻止，请调整您的输入。');
-                } else {
-                    showError('未能找到相关客户信息，请尝试更换关键词。');
-                }
-            }
-        }
         
+        // This function simulates calling your Vercel Serverless Function.
+        // You need to create a file like `/api/get-customers.js` in your Vercel project.
+        async function getCustomersFromBackend(product, market) {
+            // This is the endpoint for your backend function on Vercel
+            const BACKEND_API_URL = '/api/get-customers';
+
+            try {
+                const response = await fetch(BACKEND_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ product, market })
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    console.error("Backend Error Response:", errorBody);
+                    throw new Error(`Backend error! status: ${response.status}`);
+                }
+                return await response.json();
+
+            } catch (error) {
+                console.error("Failed to fetch from backend:", error);
+                // In a real scenario, you'd handle this more gracefully.
+                // For now, we throw the error to be caught by the main handler.
+                throw error;
+            }
+        }
+
         searchBtn.addEventListener('click', async () => {
             const product = productInput.value.trim();
             const market = marketInput.value.trim();
@@ -206,20 +200,13 @@
             loader.style.display = 'flex';
             hideError();
 
-            const userQuery = `Find 40 potential B2B customers, importers, or distributors for "${product}" in "${market}". For each, find the company name, a concise one-sentence company profile, their official website URL, a relevant contact person (like a purchasing manager), the country, and a contact email or phone number.`;
-            const systemPrompt = `You are a B2B market research assistant for foreign trade. Your task is to find potential importing companies. Provide a list of companies. For each company, you must find: 1. The company name. 2. A concise one-sentence company profile. 3. The official company website. 4. A key contact person's name (e.g., Purchasing Manager, Sourcing Manager, Owner). 5. The country. 6. A contact email or phone number. Your response must be ONLY a raw JSON array string. Do not use markdown fences (like \`\`\`json) or any other explanatory text. The response must be a string that can be directly parsed into a JSON array of objects. Each object should have these keys: "company", "profile", "website", "contactPerson", "country", "contactInfo". If a specific piece of information cannot be found, return an empty string for that field. Prioritize finding the official website and company profile. Avoid duplicate companies.`;
-            
-            const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] },
-            };
-
             try {
-                const result = await callGeminiAPI(payload);
-                processApiResult(result);
-            } catch (apiError) {
-                console.error('Error calling Gemini API:', apiError);
-                showError('调用AI服务时发生网络错误，请稍后重试。');
+                // Now we call our backend function instead of Google's API directly.
+                const customers = await getCustomersFromBackend(product, market);
+                displayResultsInTable(customers);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showError('调用后端服务时发生错误，请检查您的Serverless Function。');
             } finally {
                 loader.style.display = 'none';
             }
